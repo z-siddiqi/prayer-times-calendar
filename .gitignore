@@ -1,0 +1,12 @@
+# environments
+*.env
+
+# vsc folder
+.vscode/*
+
+# calendar
+*.ics
+
+# log files
+*.log
+*.json
