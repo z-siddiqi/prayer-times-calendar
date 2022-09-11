@@ -1,11 +1,15 @@
 # environments
 *.env
+.venv
 
 # vsc folder
 .vscode/*
 
 # calendar
 *.ics
+
+# compressed files
+*.zip
 
 # log files
 *.log
