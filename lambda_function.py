@@ -1,7 +1,6 @@
 import os
 import requests
 
-from datetime import datetime
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -14,16 +13,10 @@ SCOPES = [
 ]
 
 
-def fetch_prayer_times(date):
-    url = "https://www.masjidnow.com/api/v2/salah_timings/daily.json"
-    params = {
-        "masjid_id": os.environ["MASJID"],
-        "day": date.day,
-        "month": date.month,
-        "year": date.year,
-    }
-    response = requests.get(url, params=params)
-    prayer_times = response.json()["masjid"]["salah_timing"]
+def fetch_prayer_times():
+    url = "https://centralmosque.co.uk/?rest_route=/dpt/v1/prayertime&filter=today"
+    response = requests.get(url)
+    prayer_times = response.json()[0]
     return prayer_times
 
 
@@ -32,14 +25,14 @@ def lambda_handler(event, context):
 
     service = build("calendar", "v3", credentials=creds)
 
-    prayer_times = fetch_prayer_times(datetime.today())
+    prayer_times = fetch_prayer_times()
 
     events = [
-        f"fajr today at {prayer_times['fajr_adhan']}",
-        f"dhuhr today at {prayer_times['dhuhr_adhan']}",
-        f"asr today at {prayer_times['asr_adhan_extra']}",
-        f"maghrib today at {prayer_times['maghrib_adhan']}",
-        f"isha today at {prayer_times['isha_adhan']}",
+        f"fajr on {prayer_times['d_date']} at {prayer_times['fajr_begins']}",
+        f"dhuhr on {prayer_times['d_date']} at {prayer_times['zuhr_begins']}",
+        f"asr on {prayer_times['d_date']} at {prayer_times['asr_mithl_2']}",
+        f"maghrib on {prayer_times['d_date']} at {prayer_times['maghrib_begins']}",
+        f"isha on {prayer_times['d_date']} at {prayer_times['isha_begins']}",
     ]
 
     for event in events:
