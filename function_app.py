@@ -58,11 +58,11 @@ def prayer_times_calendar(timer: func.TimerRequest) -> None:
 
     for prayer, time in events:
         try:
-            start_time = datetime.strptime(f"{prayer_times['d_date']} {time}", "%Y-%m-%d %H:%M")
+            start_time = datetime.strptime(f"{prayer_times['d_date']} {time}", "%Y-%m-%d %H:%M:%S")
             end_time = start_time + timedelta(minutes=15)
 
             event = {
-                'summary': f"{prayer.capitalize()} Prayer",
+                'summary': prayer,
                 'start': {
                     'dateTime': start_time.isoformat(),
                     'timeZone': 'Europe/London',
@@ -75,5 +75,7 @@ def prayer_times_calendar(timer: func.TimerRequest) -> None:
 
             created_event = service.events().insert(calendarId=CALENDAR, body=event).execute()
             logging.info(f"Event created: {created_event['htmlLink']}")
+        except ValueError as e:
+            logging.error(f"Error parsing prayer data for {prayer}: {e}")
         except HttpError as error:
             logging.error(f"An error occurred: {error}")
